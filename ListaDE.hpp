@@ -10,7 +10,8 @@ class ListaDE{
 public:
     ListaDE();
     void ImprimeLista();
-    float InsereNoInicio(float dado);
+    int InsereNoInicio(float x1, float y1); //Ira inserir o nodo no inicio
+    int Insere(float x1, float x2, int pos); // Ira inserir o dado apos a posicao que indicar
     float InsereNoFim(float dado);
     float RemoveDoInicio(float &dado);
     float RemoveDoFim(float &dado);
