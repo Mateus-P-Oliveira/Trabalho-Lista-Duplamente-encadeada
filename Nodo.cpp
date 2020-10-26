@@ -38,3 +38,4 @@ void Nodo::setPrev(Nodo *p){ // Define o nodo anterior
 Nodo* Nodo::getPrev(){ // Retorna quem e o nodo anterior
     return prev;
 }
+

@@ -16,6 +16,7 @@ public:
     void setPrev(Nodo *p);
     Nodo* getPrev();
    
+   
 };
 
 #endif
