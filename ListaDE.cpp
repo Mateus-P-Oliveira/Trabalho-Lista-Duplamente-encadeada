@@ -58,7 +58,7 @@ int ListaDE::Insere(float x1, float y1, int pos){ //Pode dar memory leak -- Test
 }
 
 
-int ListaDE::Remove(int pos){
+int ListaDE::Remove(int pos){ // Remove o nodo que eu escolhi
     if(NodosAlocados == 3 || NodosAlocados < 3) return 0; // Teste para ver se existe menos de 3 vertices
     Nodo *ptr, *depois, *antes;
     ptr = Inicio;
@@ -110,7 +110,8 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
     ptr = Inicio;
     //Imprimir sentido de insercao
     if(modo == 1){
-        ss << "Impressao em ordem" << endl; 
+        cout << "Impressao em ordem" << endl; 
+        ss << NodosAlocados << endl;
         for(int i = 0; i < NodosAlocados - 1; i++){
             ptr->getInfo(x, y);
             ss << x << y << endl;
@@ -119,7 +120,8 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
     }
     //Imprimir sentido inverso
     else if(modo == 0){
-        ss << "Impressao em ordem reversa" << endl;
+        cout << "Impressao em ordem reversa" << endl;
+        ss << NodosAlocados << endl;
         for(int i = 0; i < NodosAlocados - 1; i++){
             ptr = ptr->prox;
         }
@@ -131,11 +133,107 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
     }
     else
     {
-        cout << "Modo Invalido" << endl;
+        cout << "Nodo Invalido" << endl;
     }
     
     ss << endl;
     
-    return ss.str();
+    return ss.str(); // Retorna a string que eu irei imprimir | Tambem vou usa-la para salvar
 
+}
+
+int ListaDE::Split(int pos1, int pos2, ListaDE &poligonoMemoria){ //Separador dos nodos
+    //Testes de validade da posicao
+    if(pos1 < 0 || pos2 < 0) return 0; //Checa se nao sao valores negativos
+    if(abs(pos1-pos2) <= 1)  return 0; //Caso eles sejam adjacente a distancia sera ficara entre -1 e 1 e ai nao podera ser realizado o comando split
+    //Mantendo a variavel mais proxima de zero sempre na frente
+    if(abs(pos2) < abs(pos1)){
+        int temp;
+        temp = pos1;
+        pos1 = pos2;
+        pos2 = temp;
+    }
+    //Fechamento do Poligono
+    Inicio->prev = Fim; //Faz o inicio apontar para o fim
+    Fim->prox = Inicio; //Faz o fim apontar para o Inicio
+    //Armazenando ponteiros dos vertices que serao separados
+    Nodo *ptr1, *pos1prox, *pos1prev;
+    ptr1 = Inicio;
+
+    for(int i = 0; i < pos1 - 1; i++){
+        ptr1 = ptr1->prox;
+    }
+    pos1prev = ptr1->prev;
+    pos1prox = ptr1->prox;
+
+    Nodo *ptr2, *pos2prox, *pos2prev;
+    ptr2 = Inicio;
+
+    for(int i = 0; i < pos2 - 1; i++){
+        ptr2 = ptr2->prox;
+    }
+    pos2prev = ptr2->prev;
+    pos2prox = ptr2->prox;
+    //Fechando os dois poligonos
+    ptr1->prev = ptr2;
+    ptr2->prox = ptr1;
+    //Criar dois novos poligonos
+    ListaDE polig1, polig2;
+    float x, y;
+    int elementos1 = 0, elementos2 = 0;
+    Nodo *temp;
+    temp = ptr1;
+    while (ptr1 != ptr2)
+    {
+        ptr1->getInfo(x,y);
+        polig1.InsereNoInicio(x,y);
+        ptr1 = ptr1->prox;
+        elementos1++;
+    }
+    ptr1->prev = pos1prev;
+    ptr1->prox = ptr2;
+    ptr2->prev = ptr1;
+    ptr2->prox = pos2prox;
+    while(ptr2 !=ptr1){
+        ptr2->getInfo(x,y);
+        polig2.InsereNoInicio(x,y);
+        ptr2 = ptr2->prox;
+        elementos2++;
+    }
+    //Compara qual poligono e menor e qual e maior
+    if(elementos2 <= elementos1){
+        poligonoMemoria = polig1;
+        SalvaLista(polig2);
+        polig2.LimparLista();
+    }
+    else{
+        poligonoMemoria = polig2;
+        SalvaLista(polig1);
+        polig1.LimparLista();
+    }
+    
+    
+    return 1;
+}
+
+void ListaDE::SalvaLista(ListaDE poligono){//Salva a lista em um arquivo
+    string nome;
+    bool n;
+    cout << "Insira nome que sera usado no arquivo de saida: " << endl;
+    cin >> nome;
+    cout << "Lista impressa em ordem normal ou Inversa: " << endl;
+    cin >> n;
+    ofstream out(nome);
+    out << poligono.ImprimeLista(n);
+    out.close();
+}
+
+void ListaDE::LimparLista(){//Limpa a lista //Mudar mais tarde
+    Nodo *temp;
+    temp = AlocaNodo(0.0,0.0); //Cria um nodo vazio
+    while(Inicio != nullptr){ //Enquanto o Inicio nao estiver vazio
+        temp = Inicio;
+        Inicio = Inicio->prox;
+        free(temp);
+    }
 }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <fstream>
 
 using namespace std;
 
@@ -17,11 +18,13 @@ public:
     string ImprimeLista(bool modo);//Imprime a lista e define o sentido da impressao
     int InsereNoInicio(float x1, float y1); //Ira inserir o nodo no inicio
     int Insere(float x1, float x2, int pos); // Ira inserir o dado apos a posicao que indicar
-    //float InsereNoFim(float dado); //Nao vou usa-la 
     int Remove(int pos);//Remove Vertices
     Nodo* AlocaNodo(float x, float y);//Cria um nodo novo e aumenta um valor no contador
     void DestroiNodo(Nodo *n);//Destroi um nodo e diminui o contador
     int TotalNodos(); //Retorna quantos nodos foram alocados
+    int Split(int pos1, int pos2, ListaDE &poligonoMemoria); //Recebe a posicao de dois polignos | Poderia usar bool
+    void SalvaLista(ListaDE poligono); //Ira salvar a lista em um txt
+    void LimparLista(); //Deleta todos elementos da lista
 };
 
 #endif
