@@ -112,7 +112,8 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
     if(modo == 1){
         ss << "Impressao em ordem" << endl; 
         for(int i = 0; i < NodosAlocados - 1; i++){
-            ss << ptr->getInfo(x,y) << endl;
+            ptr->getInfo(x, y);
+            ss << x << y << endl;
             ptr = ptr->prox;
         }
     }
@@ -123,7 +124,8 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
             ptr = ptr->prox;
         }
         for(int i = NodosAlocados; i >= 0; i++){
-            ss << ptr->getInfo(x,y) << endl;
+            ptr->getInfo(x, y);
+            ss << x << y << endl;
             ptr = ptr->prev;
         }
     }
