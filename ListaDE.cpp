@@ -20,10 +20,32 @@ int ListaDE::InsereNoInicio(float x1, float y1){//Na main quando for inserir che
     }
     else{
         p->prox = Inicio;
+        Inicio->prev = p;
         Inicio = p;
         p->prev = nullptr;
     }
     //contador++;
+    return 1;
+
+}
+
+int ListaDE::InsereNoFim(float x1, float y1){//Aloca no fim os nodos
+    Nodo *p;
+
+    p = AlocaNodo(x1,y1);
+    p->prox = nullptr;
+
+    if(Fim == nullptr){
+        Fim = p;
+        Inicio = p;
+    }
+    else{
+        p->prev = Fim;
+        Fim->prox = p;
+        Fim = p;
+        p->prox = nullptr;
+    }
+
     return 1;
 
 }
@@ -59,10 +81,10 @@ int ListaDE::Insere(float x1, float y1, int pos){ //Pode dar memory leak -- Test
 
 
 int ListaDE::Remove(int pos){ // Remove o nodo que eu escolhi
-    if(NodosAlocados == 3 || NodosAlocados < 3) return 0; // Teste para ver se existe menos de 3 vertices
+    if(NodosAlocados <= 3) return 0; // Teste para ver se existe menos de 3 vertices
     Nodo *ptr, *depois, *antes;
     ptr = Inicio;
-    for(int i = 0; i < pos-1; i++){
+    for(int i = 0; i < pos; i++){
         ptr = ptr->prox;
 
     }
@@ -107,27 +129,26 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
     stringstream ss;
     Nodo *ptr;
     float x, y;
-    ptr = Inicio;
+    
     //Imprimir sentido de insercao
     if(modo == 1){
+        ptr = Inicio;
         cout << "Impressao em ordem" << endl; 
         ss << NodosAlocados << endl;
-        for(int i = 0; i < NodosAlocados - 1; i++){
+        for(int i = 0; i < NodosAlocados; i++){
             ptr->getInfo(x, y);
-            ss << x << y << endl;
+            ss << x << " " << y << endl;
             ptr = ptr->prox;
         }
     }
     //Imprimir sentido inverso
     else if(modo == 0){
+        ptr = Fim;
         cout << "Impressao em ordem reversa" << endl;
         ss << NodosAlocados << endl;
-        for(int i = 0; i < NodosAlocados - 1; i++){
-            ptr = ptr->prox;
-        }
-        for(int i = NodosAlocados; i >= 0; i++){
-            ptr->getInfo(x, y);
-            ss << x << y << endl;
+        for(int i = NodosAlocados; i != 0; i--){
+            ptr->getInfo(x,y);
+            ss << x << " " << y << endl;
             ptr = ptr->prev;
         }
     }
@@ -136,7 +157,46 @@ string ListaDE::ImprimeLista(bool modo){ //Imprime os dados
         cout << "Nodo Invalido" << endl;
     }
     
-    ss << endl;
+    //ss << endl; // Caso queira um espaco no final eu coloco aqui
+    
+    return ss.str(); // Retorna a string que eu irei imprimir | Tambem vou usa-la para salvar
+
+}
+
+
+string ListaDE::ImprimeListaSemNodo(bool modo){ //Imprime os dados
+    stringstream ss;
+    Nodo *ptr;
+    float x, y;
+    
+    //Imprimir sentido de insercao
+    if(modo == 1){
+        ptr = Inicio;
+        cout << "Impressao em ordem" << endl; 
+        
+        for(int i = 0; i < NodosAlocados; i++){
+            ptr->getInfo(x, y);
+            ss << x << " " << y << endl;
+            ptr = ptr->prox;
+        }
+    }
+    //Imprimir sentido inverso
+    else if(modo == 0){
+        ptr = Fim;
+        cout << "Impressao em ordem reversa" << endl;
+        
+        for(int i = NodosAlocados; i != 0; i--){
+            ptr->getInfo(x,y);
+            ss << x << " " << y << endl;
+            ptr = ptr->prev;
+        }
+    }
+    else
+    {
+        cout << "Nodo Invalido" << endl;
+    }
+    
+    //ss << endl; // Caso queira um espaco no final eu coloco aqui
     
     return ss.str(); // Retorna a string que eu irei imprimir | Tambem vou usa-la para salvar
 
@@ -153,61 +213,70 @@ int ListaDE::Split(int pos1, int pos2, ListaDE &poligonoMemoria){ //Separador do
         pos1 = pos2;
         pos2 = temp;
     }
-    //Fechamento do Poligono
-    Inicio->prev = Fim; //Faz o inicio apontar para o fim
-    Fim->prox = Inicio; //Faz o fim apontar para o Inicio
     //Armazenando ponteiros dos vertices que serao separados
-    Nodo *ptr1, *pos1prox, *pos1prev;
+    Nodo *ptr1;
     ptr1 = Inicio;
 
-    for(int i = 0; i < pos1 - 1; i++){
+    for(int i = 0; i < pos1; i++){
         ptr1 = ptr1->prox;
     }
-    pos1prev = ptr1->prev;
-    pos1prox = ptr1->prox;
-
-    Nodo *ptr2, *pos2prox, *pos2prev;
+    
+    Nodo *ptr2;
     ptr2 = Inicio;
 
-    for(int i = 0; i < pos2 - 1; i++){
+    for(int i = 0; i <= pos2; i++){
         ptr2 = ptr2->prox;
     }
-    pos2prev = ptr2->prev;
-    pos2prox = ptr2->prox;
-    //Fechando os dois poligonos
-    ptr1->prev = ptr2;
-    ptr2->prox = ptr1;
+   
     //Criar dois novos poligonos
     ListaDE polig1, polig2;
     float x, y;
     int elementos1 = 0, elementos2 = 0;
-    Nodo *temp;
-    temp = ptr1;
+    Nodo *temp, *aux;
+    temp = Inicio;
+    aux = ptr1;
     while (ptr1 != ptr2)
     {
         ptr1->getInfo(x,y);
-        polig1.InsereNoInicio(x,y);
+        polig1.InsereNoFim(x,y);
         ptr1 = ptr1->prox;
         elementos1++;
     }
-    ptr1->prev = pos1prev;
-    ptr1->prox = ptr2;
-    ptr2->prev = ptr1;
-    ptr2->prox = pos2prox;
-    while(ptr2 !=ptr1){
-        ptr2->getInfo(x,y);
-        polig2.InsereNoInicio(x,y);
-        ptr2 = ptr2->prox;
-        elementos2++;
+    ptr1 = aux;
+    while (temp != nullptr)
+    {
+        if(temp == ptr1){
+            temp->getInfo(x,y);
+            polig2.InsereNoFim(x,y);
+            elementos2++;
+            while(temp->prox != ptr2){
+                temp = temp->prox;
+            }
+        }
+        else{
+            
+            temp->getInfo(x,y);
+            polig2.InsereNoFim(x,y);
+            
+            elementos2++;
+            temp = temp->prox;
+        }
+        
     }
+    
+    //Testes dos poligs que saem
+    //cout << polig1.ImprimeLista(1);
+    //cout << polig2.ImprimeLista(1);
     //Compara qual poligono e menor e qual e maior
     if(elementos2 <= elementos1){
         poligonoMemoria = polig1;
+        NodosAlocados = elementos1;
         SalvaLista(polig2);
         polig2.LimparLista();
     }
     else{
         poligonoMemoria = polig2;
+        NodosAlocados = elementos2;
         SalvaLista(polig1);
         polig1.LimparLista();
     }
@@ -221,7 +290,7 @@ void ListaDE::SalvaLista(ListaDE poligono){//Salva a lista em um arquivo
     bool n;
     cout << "Insira nome que sera usado no arquivo de saida: " << endl;
     cin >> nome;
-    cout << "Lista impressa em ordem normal ou Inversa: " << endl;
+    cout << "Lista impressa em ordem Normal[1] ou Reversa[0]: " << endl;
     cin >> n;
     ofstream out(nome);
     out << poligono.ImprimeLista(n);
@@ -236,4 +305,8 @@ void ListaDE::LimparLista(){//Limpa a lista //Mudar mais tarde
         Inicio = Inicio->prox;
         free(temp);
     }
+}
+
+int ListaDE::TotalNodos(){
+    return NodosAlocados;
 }
